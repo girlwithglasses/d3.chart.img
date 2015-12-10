@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Make Your Own Heatmap!</title>
+	<link rel="stylesheet" type="text/css" href="http://img-proportal.dev/css/proportal.css">
+	<link rel="stylesheet" type="text/css" href="http://img-proportal.dev/d3/lib/colorbrewer/colorbrewer.css">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		.matrix__container .null {
+			fill: deepskyblue;
+		}
+		.matrix__container .qundefined-9 {
+			fill: none;
+		}
+		.text_hidden text {
+			opacity: 0;
+		}
+		.q5-9 ~ text, .q6-9 ~ text, .q7-9 ~ text, .q8-9 ~ text {
+			fill: #fff;
+		}
+		.data-input__textarea {
+			width: 100%;
+		}
+
+		.data-input__fieldset, col-chooser__fieldset {
+			border: .25rem solid transparent;
+			border-width: 0 .25rem;
+			padding: .75rem;
+		}
+		.data-input__errmsg, .col-chooser__errmsg {
+			display: none;
+		}
+		.error .data-input__errmsg, .error .col-chooser__errmsg {
+			display: block;
+		}
+		.data-input__fieldset.error, .col-chooser__fieldset.error {
+			border-left-color: red;
+		}
+		.col-chooser__item {
+			float: left;
+			padding: .75rem;
+			margin-right: 1rem;
+		}
+		.col-chooser__cbox {
+			display: none;
+		}
+		.col-chooser__item :checked ~ label {
+			color: red;
+		}
+
+	</style>
+	</head>
+	<body>
+<div class="wrapper">
+	<h1>Build Your Own Heatmap!</h1>
+
+	<form id="data_input" method="POST" action="#">
+		<fieldset class="data-input__container">
+			<fieldset class="data-input__fieldset">
+				<h4 class="data-input__title">Raw data</h4>
+				<label class="data-input__label" for="data">Paste your data into the box, and select the correct format for the data using the radio buttons.</label>
+				<p class='data-input__errmsg' id='data_input_error'>
+					No data found! Please make sure that you have chosen the correct data format.
+				</p>
+				<textarea id="data" class="data-input__textarea" name="data" required>ColumnName	Notes	Study Name	GOLD Project ID	taxon_oid	Alternative Name	Ecotype	Clade	Ecosystem	Ecosystem Category	Ecosystem Type	Ecosystem Subtype	Specific Ecosystem	Host Name	Morphotype	-	Depth	Latitude (N)	Longitude (E)	Longhurst Province Code	Longhurst Province	Ocean	Geographic Location	Isolation	Isolation Date	Station	Cruise	noname	Temperature (WOA)	Salinity (WOA)	Dissolved Oxygen (WOA)	Silicate (WOA)	Phosphate (WOA)	Nitrate (WOA)
+Prochlorococcus isolate genomes		Prochlorococcus marinus marinus CCMP1375 (re-annotation)	Gp0000623	2606217495	Prochlorococcus sp. SS120	Low light adapted (LL)	LLII/III	Environmental	Aquatic	Marine	Pelagic	Oceanic Pelagic			-	120	28.983333	-64.35	NASW	Westerlies - N. Atlantic Subtropical Gyral Province (West) (STGW)	Atlantic Ocean	Sargasso Sea, North Atlantic Ocean	120 m depth from the Sargasso Sea, North Atlantic Ocean in May 1988 in deep euphotic zone.	1988-05-30			-	19.873	36.6	4.967	0.973	0.024	0.917
+		Prochlorococcus marinus MIT9313 (re-annotation)	Gp0000621	2606217562		Low light adapted (LL)	LLIV	Environmental	Aquatic	Marine	Pelagic	Oceanic Pelagic			-	135	37.083333	-68.033333	NASW	Westerlies - N. Atlantic Subtropical Gyral Province (West) (STGW)	Atlantic Ocean	Gulf Stream, North Atlantic Ocean	135 m depth from the Gulf Stream, North Atlantic Ocean in July 1993.	1993-07-17			-	17.205	36.514	4.44	4.242	0.316	6.241
+		</textarea>
+			</fieldset>
+			<fieldset class="data-input__fieldset">
+				<input class="data-input__radio" type="radio" name="format" id="format_csv" value="csv" />
+				<label class="data-input__label--radio" for="format_csv">CSV (comma-separated values)</label>
+				<input class="data-input__radio" type="radio" name="format" id="format_tsv" value="tsv" checked />
+				<label class="data-input__label--radio" for="format_tsv">TSV (tab-separated values)</label>
+				<input class="data-input__radio" type="radio" name="format" id="format_json" value="json" />
+				<label class="data-input__label--radio" for="format_json">JSON</label>
+			</fieldset>
+			<input class="data-input__submit" id="check_data" type="submit" value="Check my data" />
+			<p id="js_data_input_summary" class="data-input__summary"></p>
+		</fieldset>
+	</form>
+
+	<form id="col_chooser" method="POST" action="#">
+		<fieldset class="col-chooser__container">
+			<fieldset class="col-chooser__fieldset">
+				<h4 class="col-chooser__title">Columns</h4>
+				<label class="col-chooser__label" for="cols">Select the columns to display in the heatmap. Note that non-numeric values will show up as null.</label>
+				<div class="col-chooser__list-anchor" id="col_list"></div>
+			</fieldset>
+			<fieldset class="col-chooser__fieldset" id="js_tooltip_picker">
+				<h4 class="col-chooser__title">Tooltip column</h4>
+				<label class="col-chooser__label" for="tooltip_select">Select the column to use for tooltips.</label>
+				<div class="col-chooser__list-anchor" id="tooltip_select"></div>
+			</fieldset>
+
+
+			<input class="col-chooser__submit" id="js_col_chooser_submit" type="submit" value="Make my chart!" />
+		</fieldset>
+	</form>
+
+	<div class="controls__container js_hide">
+		<fieldset class="controls__fieldset" id="js_colorpicker">
+			<h4 class="controls__title">
+				Colour scheme
+			</h4>
+			<label for="colors_select" class="controls__label">
+				Select the colour scheme to use for the chart. <a rel="external" href="http://bl.ocks.org/mbostock/5577023">Colour scheme reference</a>
+			</label>
+		</fieldset>
+		<fieldset class="controls__fieldset">
+			<button class="controls_button" id="js_show_labels" checked>
+				Toggle text labels
+			</label>
+		</fieldset>
+		<fieldset class="js_parseable controls__fieldset">
+			<h4 class="controls__title">Dimensions</h4>
+			<button class="controls__button" data-param='dimensions' data-value='{ "w":"_MAX_","h":"_MAX_"}'>Fill area</button>
+			<button class="controls__title" data-param='dimensions' data-value='{ "w": 30, "h": 30 }'>30 x 30</button>
+			<button class="controls__title" data-param='dimensions' data-value='{ "w": 50, "h": 15 }'>50 x 15</button>
+		</fieldset>
+	</div>
+	<div id="target">
+	</div>
+</div>
+<script type="text/javascript" src="http://img-proportal.dev/node_modules/d3/d3.min.js"></script>
+<script type="text/javascript" src="http://img-proportal.dev/d3-tip/index.js"></script>
+
+<script type="text/javascript" src="http://img-proportal.dev/node_modules/d3.chart/d3.chart.js"></script>
+	<script src="http://img-proportal.dev/d3.chart.tooltips/d3.chart.tooltip.js"></script>
+
+	<script src="http://img-proportal.dev/js/d3.chart.heatmap.js"></script>
+	<script src="http://img-proportal.dev/d3/lib/colorbrewer/colorbrewer.js"></script>
+<script src="heatmapmaker.js"></script>
+	</body>
+</html>
