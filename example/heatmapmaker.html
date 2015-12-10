@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Make Your Own Heatmap!</title>
+<head>
+	<meta charset="utf-8">
+	<title>Make Your Own Heatmap!</title>
 	<link rel="stylesheet" type="text/css" href="/css/proportal.css">
 	<link rel="stylesheet" type="text/css" href="/css/colorbrewer.css">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -24,7 +24,7 @@
 			width: 100%;
 		}
 
-		.data-input__fieldset, col-chooser__fieldset {
+		.data-input__fieldset, .col-chooser__fieldset {
 			border: .25rem solid transparent;
 			border-width: 0 .25rem;
 			padding: .75rem;
@@ -51,15 +51,18 @@
 		}
 
 	</style>
-	</head>
-	<body>
+</head>
+<body>
 <div class="wrapper">
-	<h1>Build Your Own Heatmap!</h1>
-
+	<h1>
+		Build Your Own Heatmap!
+	</h1>
 	<form id="data_input" method="POST" action="#">
 		<fieldset class="data-input__container">
 			<fieldset class="data-input__fieldset">
-				<h4 class="data-input__title">Raw data</h4>
+				<h4 class="data-input__title">
+					Raw data
+				</h4>
 				<label class="data-input__label" for="data">Paste your data into the box, and select the correct format for the data using the radio buttons.</label>
 				<p class='data-input__errmsg' id='data_input_error'>
 					No data found! Please make sure that you have chosen the correct data format.
@@ -126,20 +129,25 @@ Synechococcus isolate genomes		Synechococcus sp. BL107	Gp0002097	639857006			5.1
 			</fieldset>
 			<fieldset class="data-input__fieldset">
 				<input class="data-input__submit" id="check_data" type="submit" value="Check my data" />
-			<!-- p id="js_data_input_summary" class="data-input__summary"></p -->
+
+<!-- p id="js_data_input_summary" class="data-input__summary"></p -->
 			</fieldset>
 		</fieldset>
 	</form>
-
 	<form id="col_chooser" method="POST" action="#">
 		<fieldset class="col-chooser__container">
 			<fieldset class="col-chooser__fieldset">
-				<h4 class="col-chooser__title">Columns</h4>
+				<h4 class="col-chooser__title">
+					Columns
+				</h4>
 				<label class="col-chooser__label" for="cols">Select the columns to display in the heatmap. Note that non-numeric values will show up as null.</label>
-				<div class="col-chooser__list-anchor" id="col_list"></div>
+				<div class="col-chooser__list-anchor" id="col_list">
+				</div>
 			</fieldset>
 			<fieldset class="col-chooser__fieldset" id="js_tooltip_picker">
-				<h4 class="col-chooser__title">Tooltip column</h4>
+				<h4 class="col-chooser__title">
+					Tooltip column
+				</h4>
 				<label class="col-chooser__label" for="tooltip_select">Select the column to use for tooltips.</label>
 			</fieldset>
 			<fieldset class="col-chooser__fieldset">
@@ -147,37 +155,26 @@ Synechococcus isolate genomes		Synechococcus sp. BL107	Gp0002097	639857006			5.1
 			</fieldset>
 		</fieldset>
 	</form>
-
-	<div class="controls__container js_hide">
+	<fieldset class="controls__container js_hide">
 		<fieldset class="controls__fieldset" id="js_colorpicker">
 			<h4 class="controls__title">
 				Colour scheme
 			</h4>
-			<label for="colors_select" class="controls__label">
-				Select the colour scheme to use for the chart. <a rel="external" href="http://bl.ocks.org/mbostock/5577023">Colour scheme reference</a>
-			</label>
+			<label for="colors_select" class="controls__label"> Select the colour scheme to use for the chart. <a rel="external" href="http://bl.ocks.org/mbostock/5577023">Colour scheme reference</a> </label>
 		</fieldset>
 		<fieldset class="controls__fieldset">
-			<button class="controls_button" id="js_show_labels" checked>
-				Toggle text labels
-			</label>
+			<button class="controls_button" id="js_show_labels"> Toggle text labels </button>
 		</fieldset>
 		<fieldset class="js_parseable controls__fieldset">
-			<h4 class="controls__title">Dimensions</h4>
-			<button class="controls__button" data-param='dimensions' data-value='{ "w":"_MAX_","h":"_MAX_"}'>Fill area</button>
-			<button class="controls__title" data-param='dimensions' data-value='{ "w": 30, "h": 30 }'>30 x 30</button>
-			<button class="controls__title" data-param='dimensions' data-value='{ "w": 50, "h": 15 }'>50 x 15</button>
+			<h4 class="controls__title">
+				Dimensions
+			</h4>
+			<button class="controls__button" data-param='dimensions' data-value='{ "w":"_MAX_","h":"_MAX_"}'>Fill area</button> <button class="controls__title" data-param='dimensions' data-value='{ "w": 30, "h": 30 }'>30 x 30</button> <button class="controls__title" data-param='dimensions' data-value='{ "w": 50, "h": 15 }'>50 x 15</button>
 		</fieldset>
-	</div>
+	</fieldset>
 	<div id="target">
 	</div>
 </div>
-<script src="/js/d3.min.js"></script>
-<script src="/js/d3-tip.js"></script>
-<script src="/js/d3.chart.min.js"></script>
-<script src="/js/d3.chart.tooltip.js"></script>
-<script src="/js/d3.chart.heatmap.js"></script>
-<script src="/js/colorbrewer.js"></script>
-<script src="heatmapmaker.js"></script>
-	</body>
+<script src="/js/d3.min.js"></script> <script src="/js/d3-tip.js"></script> <script src="/js/d3.chart.min.js"></script> <script src="/js/d3.chart.tooltip.js"></script> <script src="/js/d3.chart.heatmap.js"></script> <script src="/js/colorbrewer.js"></script> <script src="heatmapmaker.js"></script>
+</body>
 </html>
