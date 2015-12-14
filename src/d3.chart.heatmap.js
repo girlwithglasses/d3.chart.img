@@ -83,7 +83,7 @@
 		}
 
 		var chart = this
-		, prop = attr || chart.options.name
+		, prop = attr || '_id'
 		;
 
 		if (chart.data) {
@@ -102,6 +102,7 @@
 				console.log( '_: ' + _ + '; prop: ' + prop );
 				console.log("don't know what to do with sort params: " + _ + ", " + prop );
 			}
+			chart.set_scales();
 			chart.draw(chart.data);
 		}
 		return chart;
@@ -146,7 +147,7 @@
 
 		return chart;
 	},
-
+/**
 	name: function(_) {
 		var chart = this;
 
@@ -159,7 +160,7 @@
 
 		return chart;
 	},
-
+*/
 	colors: function(_) {
 		var chart = this
 		, old_colors = chart.options.colors
@@ -207,22 +208,22 @@
 	},
 
 	set_scales: function() {
-		var chart = this;
+		var chart = this
+		, counter = 0;
 		chart.xScale.domain( chart.options.columns );
 
 		// Update the y-scale.
 		// yScale is the data items, one row per item
-		chart.yScale.domain( chart.data.map( function(d){ return d[ chart.options.name ]; } ) );
+		chart.yScale.domain( chart.data.map( function(d) {
+			return d._id || (d._id = ++counter);
+		}));
 
 		// create the colour scales
 		chart.zScale_data = {};
-		chart.zScale_text = {};
 		chart.options.columns.forEach( function(c,i){
 			chart.zScale_data[ c ] = d3.scale.quantile()
 				.domain( d3.extent( chart.data, function(d){ return +d[c]; } ) )
 				.range( d3.range(9) );
-			chart.zScale_text[ c ] = chart.zScale_data[c].copy();
-			chart.zScale_text[c].range([ 0, 1 ]);
 		});
 	},
 
@@ -232,7 +233,6 @@
 		console.log('Running initialize!');
 
 		var chart = this
-		, counter = 0
 		;
 
 		chart.options = options || {};
@@ -241,7 +241,7 @@
 		chart.options.height = chart.base.node().parentNode.clientHeight;
 
 		// accessor by which to categorise data; should be a key in each object
-		chart.name( chart.options.name || 'name' );
+//		chart.name( chart.options.name || '_id' );
 		chart.duration( chart.options.duration || 750 );
 		chart.colors( chart.options.colors || 'Greys' );
 		chart.dimensions( chart.options.dimensions || { w: '_MAX_', h: '_MAX_' } );
@@ -290,43 +290,17 @@
 
 			});
 
-/**
-
-
-		chart.off("change:value").on("change:value", function() {
-			chart.d3.layout.value(function(d) {
-				return chart.options.value === "_COUNT_" ? 1 : d[chart.options.value];
-			});
-		});
-
-      // when the width changes, update the x scale range
-      chart.on("change:width", function(newWidth) {
-        chart.xScale.range([0, newWidth]);
-		d3.select('#current_state')
-			.html('width: ' + chart._width + '; height: ' + chart._height);
-      });
-
-      chart.on("change:height", function(newHeight) {
-		d3.select('#current_state')
-			.html('width: ' + chart._width + '; height: ' + chart._height);
-      });
-
-		chart.on('resize',function( ){
-			d3.select('#current_state')
-				.html('width: ' + chart._width + '; height: ' + chart._height);
-		});
-*/
-
       // add a boxes layer
 		this.layer("matrix", this.base.append("g").classed( this.colors() + ' matrix__container', true), {
 
 			dataBind: function(data) {
+
 				console.log('running dataBind event');
 				this.chart().set_scales();
 
 				return this.selectAll('.matrix')
 					.data(data, function(d) {
-						return d._id || (d._id = ++counter);
+						return d._id;
 					});
 			},
 
@@ -356,7 +330,6 @@
 				},
 
 				'enter' : function() {
-					console.log('running enter event');
 					this.chart().columns().forEach( function(c){
 						var g = this.append('g')
 							.attr('class', c.replace( /[^a-zA-Z_]+/g, '_' ) );
@@ -368,15 +341,13 @@
 				},
 
 				'merge:transition':function(){
-					console.log('running merge:transition event');
 
 					var chart = this.chart();
-
 					chart.columns().forEach( function(c){
 						this.select('.' + c.replace( /[^a-zA-Z_]+/g, '_' ) )
-							.attr('transform', function(d){
+							.attr('transform', function(d,i){
 								return 'translate(' + chart.xScale( c ) + ','
-								+ chart.yScale( d[ chart.name() ] )
+								+ chart.yScale( d._id )
 								+ ')'; });
 
 						this.select('.' + c.replace( /[^a-zA-Z_]+/g, '_' ) + ' rect')
@@ -393,6 +364,7 @@
 							.attr('dy', chart.yScale.rangeBand()/2 );
 					}, this );
 				},
+
 				'exit' : function(){
 					console.log('running exit event');
 					this.remove();
