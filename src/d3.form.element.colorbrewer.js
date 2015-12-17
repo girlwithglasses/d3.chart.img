@@ -97,7 +97,11 @@ ColorBrewerControl.prototype = {
 			.attr('id', args.id );
 
 		cntrl.selectAll('option')
-		.data( schema.properties.colors.enum )
+		.data( schema.properties.colors.enum.map(function(d){ return { value: d, title:
+			( schema.properties.colors.enum_map
+				? schema.properties.colors.enum_map[d]
+				: d )
+			)
 			.enter()
 			.append( 'option' )
 			.attr('value', function( d ) { return d; } )
