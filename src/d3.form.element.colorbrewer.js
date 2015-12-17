@@ -2,7 +2,6 @@
 /*jshint laxcomma: true */
 //(function(){
 
-
 var ColorBrewerControl = function ( cb ) {
 	"use strict";
 
@@ -34,7 +33,6 @@ ColorBrewerControl.prototype = {
 
 	/**
 		schema: function to generate the schema for a colorbrewer element
-		schema is also a property of ColorBrewerControl holding the value of the schema
 	*/
 
 	, schema: function() {
