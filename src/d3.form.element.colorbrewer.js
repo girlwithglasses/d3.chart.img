@@ -105,12 +105,10 @@ ColorBrewerControl.prototype = {
 			}))
 			.enter()
 			.append( 'option' )
-			.attr('value', function( d ) { return d; } )
+			.attr('value', function( d ) { return d.value; } )
 			.text( function( d ){
-				return schema.properties.colors.enum_map
-					? schema.properties.colors.enum_map[d]
-					: d;
-				});
+				return d.title;
+			});
 		return cntrl;
 	}
 };
